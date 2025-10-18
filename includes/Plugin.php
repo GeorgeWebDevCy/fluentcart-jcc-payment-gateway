@@ -2,24 +2,32 @@
 
 namespace FluentCartJcc;
 
-use FluentCartJcc\Payment\JccGateway;
-
 class Plugin
 {
+    protected static $registered = false;
+
     public static function boot(): void
     {
-        add_action('plugins_loaded', [__CLASS__, 'maybeRegister']);
+        add_action('fluent_cart/register_payment_methods', [__CLASS__, 'registerGateway']);
+        add_action('init', [__CLASS__, 'maybeRegisterOnInit'], 20);
     }
 
-    public static function maybeRegister(): void
+    public static function registerGateway(): void
     {
-        if (!function_exists('fluent_cart_api')) {
+        if (self::$registered || !function_exists('fluent_cart_api')) {
             return;
         }
 
-        add_action('fluent_cart/register_payment_methods', function () {
-            $gateway = new JccGateway();
-            fluent_cart_api()->registerCustomPaymentMethod('jcc_gateway', $gateway);
-        });
+        fluent_cart_api()->registerCustomPaymentMethod('jcc_gateway', new Payment\JccGateway());
+        self::$registered = true;
+    }
+
+    public static function maybeRegisterOnInit(): void
+    {
+        if (self::$registered) {
+            return;
+        }
+
+        self::registerGateway();
     }
 }
