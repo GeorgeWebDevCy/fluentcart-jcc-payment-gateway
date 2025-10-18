@@ -10,11 +10,6 @@ class JccSettings extends BaseGatewaySettings
 {
     public $methodHandler = 'fluent_cart_payment_settings_jcc_gateway';
 
-    /**
-     * @var array
-     */
-    public $settings = [];
-
     public function __construct()
     {
         $stored = get_option($this->methodHandler, []);
@@ -138,8 +133,14 @@ class JccSettings extends BaseGatewaySettings
         return $raw;
     }
 
-    public function get($key = '', $default = null)
+    public function get($key = '')
     {
+        $default = func_num_args() > 1 ? func_get_arg(1) : null;
+
+        if ($key === '') {
+            return $this->settings;
+        }
+
         return Arr::get($this->settings, $key, $default);
     }
 
