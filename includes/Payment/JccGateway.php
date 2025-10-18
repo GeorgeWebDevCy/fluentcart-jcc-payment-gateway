@@ -24,12 +24,12 @@ class JccGateway extends AbstractPaymentGateway
     /**
      * @var JccSettings
      */
-    protected $settings;
+    public $settings;
 
     /**
      * @var JccApi
      */
-    protected $api;
+    public $api;
 
     public function __construct()
     {
