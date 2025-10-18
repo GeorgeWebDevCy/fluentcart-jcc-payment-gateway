@@ -5,6 +5,7 @@ namespace FluentCartJcc\Payment;
 use FluentCart\App\Models\Order;
 use FluentCart\App\Models\OrderTransaction;
 use FluentCart\App\Modules\PaymentMethods\Core\AbstractPaymentGateway;
+use FluentCart\App\Modules\PaymentMethods\Core\BaseGatewaySettings;
 use FluentCart\App\Services\Payments\PaymentInstance;
 use FluentCart\App\Services\Payments\Status;
 use FluentCart\App\Services\Payments\StatusHelper;
@@ -22,14 +23,11 @@ class JccGateway extends AbstractPaymentGateway
     ];
 
     /**
-     * @var JccSettings
+     * @var BaseGatewaySettings
      */
-    public $settings;
+    public BaseGatewaySettings $settings;
 
-    /**
-     * @var JccApi
-     */
-    public $api;
+    public JccApi $api;
 
     public function __construct()
     {
