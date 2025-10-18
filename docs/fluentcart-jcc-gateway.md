@@ -17,6 +17,8 @@
 - **Refunds & reversals:** Implements the same two-step logic (reverse vs. refund) by re-checking gateway status before confirming success.
 - **Google Pay:** Loads Google Pay SDK, exposes a JS helper to mount buttons, and proxies tokens to JCC’s `/payment/google/payment.do` endpoint.
 - **Logging:** Structured UTC logs echo key request/response pairs for troubleshooting, similar to WooCommerce’s monthly log files.
+- **Custom checkout channel:** Registers `jcc_gateway` with FluentCart’s custom checkout button list so the Google Pay UI mounts automatically, and persists enriched transaction metadata (amount, mode, gateway response) for reconciliation.
+- **Webhook endpoint:** Supports both the legacy query endpoint and a REST route (`/wp-json/fluentcart/jcc/v1/webhook`) with basic-auth verification matching the configured merchant credentials.
 
 ## Integration Checklist
 1. Enable the gateway and supply test merchant credentials in FluentCart → Payments → JCC.
@@ -31,6 +33,6 @@
 7. Confirm refunds from FluentCart push to JCC and record the adjustment in order history.
 
 ## Follow-Up / TODO
-- Exercise callback and refund flows against the JCC sandbox to confirm status mapping and note handling.
+- Exercise callback, REST webhook, and refund flows against the JCC sandbox to confirm status mapping and note handling.
 - Extend `OrderPayloadBuilder` once FluentCart exposes richer item-level metadata (e.g., discounts, FES TRU codes).
 - Build automated tests (or expand the manual test suite in `docs/testing-plan.md`) when a FluentCart test harness is available.

@@ -21,6 +21,7 @@ Use this checklist to validate the FluentCart JCC gateway in the JCC sandbox onc
 4. **Callback accuracy**
    - For static callbacks: check JCC logs that the configured callback URL is invoked and FluentCart updates order state without manual refresh.
    - For dynamic callbacks: toggle mode, place another order, and ensure the nonce-protected callback URL works (look for `Invalid callback nonce` in logs).
+   - Hit the REST webhook endpoint (`/wp-json/fluentcart/jcc/v1/webhook`) with the same payload using Basic Auth (`merchant_id:password`) to confirm authentication and JSON responses.
 5. **Refunds**
    - Complete a JCC-hosted payment.
    - Issue a partial and a full refund inside FluentCart; confirm gateway API responses succeed and the order displays refund notes.
