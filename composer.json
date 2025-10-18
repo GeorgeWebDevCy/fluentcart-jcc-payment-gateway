@@ -1,0 +1,5 @@
+{
+    "require": {
+        "yahnis-elsts/wp-update-server": "^2.0"
+    }
+}
