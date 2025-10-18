@@ -5,13 +5,15 @@ namespace FluentCartJcc\Payment;
 use FluentCart\App\Models\Order;
 use FluentCart\App\Models\OrderTransaction;
 use FluentCart\App\Modules\PaymentMethods\Core\AbstractPaymentGateway;
-use FluentCart\App\Modules\PaymentMethods\Core\BaseGatewaySettings;
 use FluentCart\App\Services\Payments\PaymentInstance;
 use FluentCart\App\Services\Payments\Status;
 use FluentCart\App\Services\Payments\StatusHelper;
 use FluentCart\Framework\Support\Arr;
 use FluentCartJcc\Logger;
 
+/**
+ * @property JccSettings $settings
+ */
 class JccGateway extends AbstractPaymentGateway
 {
     public array $supportedFeatures = [
@@ -22,18 +24,14 @@ class JccGateway extends AbstractPaymentGateway
         'google_pay',
     ];
 
-    /**
-     * @var BaseGatewaySettings
-     */
-    public BaseGatewaySettings $settings;
-
     public JccApi $api;
 
     public function __construct()
     {
-        $this->settings = new JccSettings();
-        parent::__construct($this->settings);
-        $this->api = new JccApi($this->settings);
+        $settings = new JccSettings();
+        parent::__construct($settings);
+        $this->settings = $settings;
+        $this->api = new JccApi($settings);
     }
 
     public function boot()
