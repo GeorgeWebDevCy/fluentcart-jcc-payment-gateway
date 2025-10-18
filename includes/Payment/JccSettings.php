@@ -9,15 +9,13 @@ use FluentCart\Framework\Support\Arr;
 
 class JccSettings extends BaseGatewaySettings
 {
-    public string $methodHandler = 'fluent_cart_payment_settings_jcc';
-
-    protected array $settings = [];
-
     protected StoreSettings $storeSettings;
 
     public function __construct()
     {
         parent::__construct();
+
+        $this->methodHandler = 'fluent_cart_payment_settings_jcc';
 
         $stored = fluent_cart_get_option($this->methodHandler, []);
         $defaults = static::getDefaults();
