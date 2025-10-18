@@ -38,8 +38,6 @@ class JccGateway extends AbstractPaymentGateway
 
     public function boot()
     {
-        parent::boot();
-
         add_action('fluent_cart/payments/jcc_gateway/webhook_payment_completed', [$this, 'handlePaymentCompleted']);
         add_action('fluent_cart/payments/jcc_gateway/webhook_refunded', [$this, 'handleRefundWebhook']);
         add_action('fluent_cart/payments/jcc_gateway/webhook_reversed', [$this, 'handleReverseWebhook']);
