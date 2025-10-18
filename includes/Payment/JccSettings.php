@@ -138,7 +138,7 @@ class JccSettings extends BaseGatewaySettings
         return $raw;
     }
 
-    public function get($key, $default = null)
+    public function get($key = '', $default = null)
     {
         return Arr::get($this->settings, $key, $default);
     }
