@@ -3,7 +3,7 @@
  * Plugin Name: FluentCart JCC Payment Gateway
  * Description: Adds the JCC hosted payment gateway (including callbacks, refunds, Google Pay, and fiscal payloads) to FluentCart.
  * Author: FluentCart JCC Integration Team
- * Version: 0.1.0
+ * Version: 1.0.0
  * Requires at least: 6.0
  * Requires PHP: 8.1
  *
@@ -18,10 +18,14 @@ if (defined('FLUENTCART_JCC_GATEWAY_VERSION')) {
     return;
 }
 
-define('FLUENTCART_JCC_GATEWAY_VERSION', '0.1.0');
+define('FLUENTCART_JCC_GATEWAY_VERSION', '1.0.0');
 define('FLUENTCART_JCC_GATEWAY_FILE', __FILE__);
 define('FLUENTCART_JCC_GATEWAY_PATH', plugin_dir_path(__FILE__));
 define('FLUENTCART_JCC_GATEWAY_URL', plugin_dir_url(__FILE__));
+
+if (file_exists(__DIR__ . '/vendor/autoload.php')) {
+    require_once __DIR__ . '/vendor/autoload.php';
+}
 
 /**
  * Simple PSR-4 autoloader for the plugin classes.
@@ -69,6 +73,8 @@ function fluentcart_jcc_gateway_activate(): void
 register_activation_hook(FLUENTCART_JCC_GATEWAY_FILE, 'fluentcart_jcc_gateway_activate');
 
 add_action('plugins_loaded', static function () {
+    (FluentCartJcc\Updater::instance())->boot();
+
     if (!function_exists('fluent_cart_api')) {
         add_action('admin_notices', 'fluentcart_jcc_gateway_missing_dependency_notice');
         return;
