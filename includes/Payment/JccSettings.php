@@ -10,7 +10,10 @@ class JccSettings extends BaseGatewaySettings
 {
     public $methodHandler = 'fluent_cart_payment_settings_jcc_gateway';
 
-    public array $settings = [];
+    /**
+     * @var array
+     */
+    public $settings = [];
 
     public function __construct()
     {
