@@ -437,13 +437,17 @@ class JccGateway extends AbstractPaymentGateway
             return;
         }
 
+        $this->attachTransactionMeta($transaction, [
+            'orderId' => $orderId,
+            'orderNumber' => $orderNumber,
+        ]);
+
         if ($transaction->status === Status::TRANSACTION_SUCCEEDED) {
             return;
         }
 
         $transaction->fill([
             'status' => Status::TRANSACTION_SUCCEEDED,
-            'vendor_charge_id' => $orderId,
         ]);
         $transaction->save();
 
@@ -751,19 +755,43 @@ class JccGateway extends AbstractPaymentGateway
 
     private function attachTransactionMeta($transaction, array $data): void
     {
-        if (method_exists($transaction, 'setMeta')) {
-            $transaction->setMeta('jcc_gateway', $data);
+        $meta = $data;
+        $baseOrderNumber = null;
+
+        if (!empty($data['orderNumber'])) {
+            $baseOrderNumber = $this->normalizeGatewayOrderNumber($data['orderNumber']);
+        } elseif (!empty($data['baseOrderNumber'])) {
+            $baseOrderNumber = $this->normalizeGatewayOrderNumber($data['baseOrderNumber']);
         }
 
+        if ($baseOrderNumber) {
+            $meta['baseOrderNumber'] = $baseOrderNumber;
+        }
+
+        if (method_exists($transaction, 'getMeta')) {
+            $existingMeta = $transaction->getMeta('jcc_gateway');
+            if (is_array($existingMeta)) {
+                $meta = array_merge($existingMeta, $meta);
+            }
+        }
+
+        if (method_exists($transaction, 'setMeta')) {
+            $transaction->setMeta('jcc_gateway', $meta);
+        }
+
+        if (!$baseOrderNumber) {
+            return;
+        }
+
+        $attributes = [
+            'vendor_charge_id' => $baseOrderNumber,
+        ];
+
         if (method_exists($transaction, 'fill')) {
-            $transaction->fill([
-                'vendor_charge_id' => $data['orderId'] ?? '',
-            ]);
+            $transaction->fill($attributes);
             $transaction->save();
         } elseif (method_exists($transaction, 'update')) {
-            $transaction->update([
-                'vendor_charge_id' => $data['orderId'] ?? '',
-            ]);
+            $transaction->update($attributes);
         }
     }
 
@@ -896,15 +924,41 @@ class JccGateway extends AbstractPaymentGateway
         }
     }
 
-    private function findTransactionByOrderNumber(string $orderNumber)
+    private function normalizeGatewayOrderNumber(?string $orderNumber): string
     {
+        $orderNumber = (string) $orderNumber;
+
         if (strpos($orderNumber, '_') !== false) {
             $orderNumber = explode('_', $orderNumber)[0];
         }
 
+        return trim($orderNumber);
+    }
+
+    private function findTransactionByOrderNumber(string $orderNumber)
+    {
+        $baseOrderNumber = $this->normalizeGatewayOrderNumber($orderNumber);
+
         return OrderTransaction::query()
-            ->where('vendor_charge_id', $orderNumber)
-            ->orWhere('uuid', $orderNumber)
+            ->where(function ($query) use ($baseOrderNumber, $orderNumber) {
+                $query->where('vendor_charge_id', $baseOrderNumber)
+                    ->orWhere('uuid', $baseOrderNumber);
+
+                if ($orderNumber !== $baseOrderNumber) {
+                    $query->orWhere('vendor_charge_id', $orderNumber);
+                }
+
+                if ($baseOrderNumber !== '') {
+                    $metaBasePattern = '%"baseOrderNumber":"' . $baseOrderNumber . '"%';
+                    $metaOrderPattern = '%"orderNumber":"' . $baseOrderNumber . '"%';
+
+                    // Legacy transactions stored the remote order ID in vendor_charge_id. We
+                    // fall back to the persisted meta payload so webhook callbacks can still
+                    // associate the gateway notification with the original checkout record.
+                    $query->orWhere('meta', 'like', $metaBasePattern)
+                        ->orWhere('meta', 'like', $metaOrderPattern);
+                }
+            })
             ->first();
     }
 }
