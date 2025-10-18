@@ -4,10 +4,19 @@ namespace FluentCartJcc\Payment;
 
 use FluentCart\App\Modules\PaymentMethods\Core\BaseGatewaySettings;
 use FluentCart\App\Helpers\Helper;
+use FluentCart\Framework\Support\Arr;
 
 class JccSettings extends BaseGatewaySettings
 {
     public $methodHandler = 'fluent_cart_payment_settings_jcc_gateway';
+
+    protected array $settings = [];
+
+    public function __construct()
+    {
+        $stored = get_option($this->methodHandler, []);
+        $this->settings = wp_parse_args(is_array($stored) ? $stored : [], static::getDefaults());
+    }
 
     public static function getDefaults(): array
     {
@@ -124,5 +133,20 @@ class JccSettings extends BaseGatewaySettings
         }
 
         return $raw;
+    }
+
+    public function get($key, $default = null)
+    {
+        return Arr::get($this->settings, $key, $default);
+    }
+
+    public function getMode()
+    {
+        return $this->get('payment_mode', 'test');
+    }
+
+    public function isActive(): bool
+    {
+        return $this->get('is_active') === 'yes';
     }
 }
