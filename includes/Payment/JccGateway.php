@@ -25,7 +25,7 @@ class JccGateway extends AbstractPaymentGateway
 
     protected Logger $logger;
     protected JccApi $api;
-    protected StoreSettings $storeSettings;
+    public StoreSettings $storeSettings;
 
     public function __construct()
     {
