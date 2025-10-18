@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="160" height="48" viewBox="0 0 160 48" role="img" aria-labelledby="title desc">
+  <title id="title">JCC Payment Gateway</title>
+  <desc id="desc">Simplified JCC logo placeholder.</desc>
+  <rect width="160" height="48" rx="8" fill="#005aa3"/>
+  <text x="80" y="30" text-anchor="middle" font-family="Arial, sans-serif" font-size="20" fill="#ffffff">JCC Pay</text>
+</svg>

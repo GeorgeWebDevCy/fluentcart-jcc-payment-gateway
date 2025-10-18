@@ -36,3 +36,28 @@
 - Exercise callback, REST webhook, and refund flows against the JCC sandbox to confirm status mapping and note handling.
 - Extend `OrderPayloadBuilder` once FluentCart exposes richer item-level metadata (e.g., discounts, FES TRU codes).
 - Build automated tests (or expand the manual test suite in `docs/testing-plan.md`) when a FluentCart test harness is available.
+
+## Implementation Plan (2024-05-09)
+- Introduce a standalone plugin (`fluentcart-jcc-payment-gateway.php`) that boots once FluentCart fires `fluent_cart/init` and registers the gateway via `fluent_cart_api()->registerCustomPaymentMethod('jcc', …)`.
+- Provide a lightweight namespaced autoloader (`FluentCartJcc\`) that maps to `includes/` for classes and uses constants for plugin path/URL resolution.
+- Core classes:
+  - `Payment\JccGateway` extending `AbstractPaymentGateway` to orchestrate checkout, callbacks, refunds, Google Pay, and metadata.
+  - `Payment\JccSettings` extending `BaseGatewaySettings` to expose admin fields (mode, credentials, callbacks, Google Pay, fiscal data, logging controls).
+  - `Payment\JccApi` encapsulating REST calls (register, status, refund, reverse, Google Pay tokenisation) with shared request helpers and error handling.
+  - `Payment\OrderPayloadBuilder` to translate FluentCart order + transaction context into JCC payloads (amount conversion, bundle lines, billing data, fiscal extras).
+  - `Logger` helper that writes structured JSON lines to `wp_upload_dir()/fluentcart-jcc-logs/` when enabled.
+- Frontend assets:
+  - `assets/js/google-pay.js` exposing `FluentCartJccGooglePay.mount()` to render the Google Pay button and bridge tokens back to the PHP controller.
+  - `assets/images/logo.svg` for FluentCart admin/payment icon usage.
+- Hook surface:
+  - Register REST route + legacy listener endpoints (`?fc_jcc_action=callback|result`) during `boot()`.
+  - Add filters for custom checkout buttons (`fluent_cart/payment_methods_with_custom_checkout_buttons`) when Google Pay is enabled.
+  - Expose settings fields via `fields()` and localised checkout data (mode, merchant, Google Pay config, listener URLs).
+- Logging/Documentation:
+  - Record every significant implementation step in this document with timestamps.
+  - Update `docs/testing-plan.md` as flows materialise (hosted checkout, callbacks, refunds, Google Pay).
+
+## Implementation Log
+- **2024-05-09:** Scaffolded WordPress plugin bootstrap, autoloader, and FluentCart registration flow (`fluentcart-jcc-payment-gateway.php`, `includes/Plugin.php`).
+- **2024-05-09:** Added JCC settings container, API client, payload builder, and structured logger helpers under `includes/`.
+- **2024-05-09:** Implemented `JccGateway` class with hosted checkout registration, callback handling, refund wiring, and Google Pay hooks; shipped placeholder Google Pay asset bundle and SVG logo.
