@@ -4,8 +4,8 @@
  * Description: Integrates the JCC payment gateway with FluentCart.
  * Version: 0.1.0
  * Author: George
- * Requires Plugins: fluentcart
- */
+ * Requires Plugins: fluent-cart
+*/
 
 if (!defined('ABSPATH')) {
     exit;
