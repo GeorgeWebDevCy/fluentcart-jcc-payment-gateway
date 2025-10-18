@@ -7,7 +7,7 @@
 - `includes/Payment/JccApi.php` wraps JCC endpoints (`register*.do`, `getOrderStatusExtended.do`, `refund.do`, `reverse.do`, callback sync, Google Pay tokenisation).
 - `includes/Payment/OrderPayloadBuilder.php` converts FluentCart order/line items into the structured payloads required by JCC (amounts in minor units, cart bundle, billing data).
 - `includes/Logger.php` records gateway debugging output in `uploads/fluentcart-jcc-logs/` when logging is enabled.
-- Front-end helpers live in `assets/js/google-pay.js` (Google Pay button helper) and `assets/images/logo.svg` (placeholder admin icon).
+- Front-end helpers live in `assets/js/google-pay.js` (Google Pay button helper) and `assets/images/jcc-logo.png` (JCC admin icon).
 
 ## Feature Parity with WooCommerce Reference
 - **Hosted checkout:** Delegates to JCC `register.do` / `registerPreAuth.do` based on stage mode, redirecting customers to the hosted payment page with return URL tracking FluentCart transactions.
@@ -48,7 +48,7 @@
   - `Logger` helper that writes structured JSON lines to `wp_upload_dir()/fluentcart-jcc-logs/` when enabled.
 - Frontend assets:
   - `assets/js/google-pay.js` exposing `FluentCartJccGooglePay.mount()` to render the Google Pay button and bridge tokens back to the PHP controller.
-  - `assets/images/logo.svg` for FluentCart admin/payment icon usage.
+  - `assets/images/jcc-logo.png` for FluentCart admin/payment icon usage (sourced from the official WooCommerce gateway assets).
 - Hook surface:
   - Register REST route + legacy listener endpoints (`?fc_jcc_action=callback|result`) during `boot()`.
   - Add filters for custom checkout buttons (`fluent_cart/payment_methods_with_custom_checkout_buttons`) when Google Pay is enabled.
@@ -60,4 +60,5 @@
 ## Implementation Log
 - **2024-05-09:** Scaffolded WordPress plugin bootstrap, autoloader, and FluentCart registration flow (`fluentcart-jcc-payment-gateway.php`, `includes/Plugin.php`).
 - **2024-05-09:** Added JCC settings container, API client, payload builder, and structured logger helpers under `includes/`.
-- **2024-05-09:** Implemented `JccGateway` class with hosted checkout registration, callback handling, refund wiring, and Google Pay hooks; shipped placeholder Google Pay asset bundle and SVG logo.
+- **2024-05-09:** Implemented `JccGateway` class with hosted checkout registration, callback handling, refund wiring, and Google Pay hooks; shipped Google Pay helper bundle and initial icon placeholders.
+- **2024-05-09:** Replaced placeholder artwork with official JCC branding from the WooCommerce plugin (`assets/images/jcc-logo.png`).
